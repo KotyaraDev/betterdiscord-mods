@@ -10,6 +10,8 @@
  */
 
 "use strict";
+const fs = require("fs");
+const path = require('path');
 const request = require("request");
 const config = {
   version: "1.1",
@@ -310,7 +312,7 @@ function load() {
                 BdApi.showToast("Начинаем загрузку..", {type: "info"});
 
                 request.get(
-                  "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js",
+                  config.urls[1],
                   (error, response, body) => {
                     if (error) {
                       BdApi.showToast(`Ошибка при загрузка: ${error}`, { type: "error" });
@@ -323,7 +325,7 @@ function load() {
                         body
                       );
                       
-                      BdApi.showToast(`Обновление успешно загружено!`, { type: "info" });
+                      BdApi.showToast(`Обновление загружено!`, { type: "success" });
                     } else BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
                   }
                 );
