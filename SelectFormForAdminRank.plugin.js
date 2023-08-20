@@ -6,13 +6,13 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.0
+ * @version 1.1
  */
 
 "use strict";
 const request = require("request");
 const config = {
-  version: "1.0",
+  version: "1.1",
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js",
@@ -43,7 +43,7 @@ var Formats = [
     value: "Откат дейтвия"
   },
   {
-    text: ">>> Игрок @ принят на пост модератора\n\n* Данные:\n * Ник: ` `\n * SteamID: ` `\n * Смены: ` `\n * Соц. Рейтинг: ` `\n * Discord: ` `",
+    text: ">>> Игрок @ принят на пост дневного/ночного модератора\n\n* Данные:\n * Discord: ` `\n * Ник/SteamID: ` `\n * Соц. Рейтинг: ` `\nТребуется обучение: @\nТребуется проверка: @",
     value: "Прошёл Набор"
   },
   {
@@ -55,11 +55,15 @@ var Formats = [
     value: "Прошёл Обучение"
   },
   {
-    text: ">>> Кандидат на ЛС @ принят в отдел \`\`\n* Причина: \`\`\n*Ипытательный срок: `7 дней`\n\n* Требуется:\n * Выдать роли\n * Выдать ранг (`STEAMID` | `\*RANK`)\n<@&890637093003481138><@&890607376074412082>",
+    text: ">>> Кандидат на ЛС @ принят в отдел `OTDEL`\n* Причина: ` `\n*Ипытательный срок: `7 дней`\n\n* Требуется:\n * Выдать роли\n * Выдать ранг (`STEAMID` | `RANK`)\n<@&890637093003481138><@&890607376074412082>",
     value: "Принят в отдел (ЛС-ВС)"
   },
   {
-    text: ">>> Модератор @ снят\n* Причина: \`\`\n* Чёрный-Список: \`\`",
+    text: ">>> Модератор @ повышен до `RANG`\n* Требуется:\n * Выдать ранг `STEAMID`\n<@&890637093003481138><@&890607376074412082>",
+    value: "Повышен в ранге"
+  },
+  {
+    text: ">>> Модератор @ снят\n* Причина: ` `\n* Чёрный-Список: ` `\n\n* Статистика:\n * Наказания: ` `\n * Соц. рейтинг: ` `\n * ОВНДП: ` `\n * Жалоб: ` `\n * Часов: ` `",
     value: "Снятие с поста"
   },
   {
@@ -83,11 +87,11 @@ var Formats = [
     value: "Снять выговор(ы)"
   },
   {
-    text: ">>> Модератор @ получает отпуск/заморозку с: **DATA** по: **DATA**\n* Причина: \`\`",
+    text: ">>> Модератор @ получает отпуск/заморозку (`полный/частичный`) с: **DATA** по: **DATA**\n* Причина: \`\`",
     value: "Выдать отпуск / заморозку"
   },
   {
-    text: ">>> Модератор @ лишается отпуска/заморозки\n* Причина: \`\`",
+    text: ">>> Модератор @ выходит с отпуска/заморозки\n* Причина: \`\`\n* Требуется занести в таблицу: Пинг сотрудников дневной/ночной администрации",
     value: "Снять отпуск / заморозку"
   },
   {
@@ -95,17 +99,25 @@ var Formats = [
     value: "Выдать метку"
   },
   {
-    text: ">>> Модератор @ получает `+NUMBER ед.` соц. рейтинга\n* Причина: \`\`",
+    text: ">>> Модератор @ получает рекомендацию\n* Причина: \`\`",
+    value: "Выдать рекомендацию"
+  },
+  {
+    text: ">>> Модератор @ сгорает рекомендация\n* Причина: \`\`",
+    value: "Закончилась рекомендация"
+  },
+  {
+    text: ">>> Модератор @ +NUMBER соц. рейтинга\n* Причина: \`\`",
     value: "Выдать соц. рейтинг"
   },
   {
-    text: ">>> Модератор @ получает `-NUMBER ед.` соц. рейтинга\n* Причина: \`\`",
+    text: ">>> Модератор @ -NUMBER соц. рейтинга\n* Причина: \`\`",
     value: "Снять соц. рейтинг"
   },
-  // {
-  //   text: "---",
-  //   value: "Выдать грань снятии"
-  // },
+  {
+    text: ">>> Модератор @ получает грань снятия с: **DATA** до: **DATA**\nПричина: \`\`",
+    value: "Выдать грань снятии"
+  },
   // {
   //   text: "---",
   //   value: "Снять грань снятии"
@@ -169,13 +181,14 @@ function ShowFormModal({ rootProps }) {
       BdApi.React.createElement(
         Button,
         {
+          disabled: (formatted == "---" || !formatted) ? true : false,
           onClick: () => {
             const ComponentDispatch = BdApi.Webpack.getModule((m) => m.emitter?._events?.INSERT_TEXT, {
               searchExports: true
             });
             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-              rawText: formatted + " ",
-              plainText: formatted + " "
+              rawText: formatted,
+              plainText: formatted
             });
             rootProps.onClose();
           }
@@ -283,7 +296,7 @@ function load() {
       if (response.statusCode == 200) {
         const versionData = JSON.parse(body.toString());
         
-        const old_version = "1.0";
+        const old_version = config.version;
         const new_version = versionData.versions['select-forms'];
         const changelogs = versionData.changelogs['select-forms'];
         if (old_version < new_version) {
