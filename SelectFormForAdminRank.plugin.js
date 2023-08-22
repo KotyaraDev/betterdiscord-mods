@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.1
+ * @version 1.2
  */
 
 "use strict";
@@ -14,7 +14,7 @@ const fs = require("fs");
 const path = require('path');
 const request = require("request");
 const config = {
-  version: "1.1",
+  version: "1.2",
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js",
@@ -109,11 +109,11 @@ var Formats = [
     value: "Закончилась рекомендация"
   },
   {
-    text: ">>> Модератор @ +NUMBER соц. рейтинга\n* Причина: \`\`",
+    text: ">>> @ +NUMBER рейтинга\n* Причина: \`\`",
     value: "Выдать соц. рейтинг"
   },
   {
-    text: ">>> Модератор @ -NUMBER соц. рейтинга\n* Причина: \`\`",
+    text: ">>> @ -NUMBER рейтинга\n* Причина: \`\`",
     value: "Снять соц. рейтинг"
   },
   {
