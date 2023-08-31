@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.2
+ * @version 1.3
  */
 
 "use strict";
@@ -14,10 +14,13 @@ const fs = require("fs");
 const path = require('path');
 const request = require("request");
 const config = {
-  version: "1.2",
+  version: {
+    "base": "1.3",
+  },
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js",
+    "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/selections.json",
   ],
 }
 
@@ -38,107 +41,16 @@ var {
 
 var ButtonWrapperClasses = BdApi.Webpack.getModule((m) => m.buttonWrapper && m.buttonContent);
 var cl = (...names) => names.map((n) => `vbd-its-${n}`).join(" ");
-var Formats = [
-  "---",
-  {
-    text: ">>> UPD: Откат\n* Причина: \`\`",
-    value: "Откат дейтвия"
-  },
-  {
-    text: ">>> Игрок @ принят на пост дневного/ночного модератора\n\n* Данные:\n * Discord: ` `\n * Ник/SteamID: ` `\n * Соц. Рейтинг: ` `\nТребуется обучение: @\nТребуется проверка: @",
-    value: "Прошёл Набор"
-  },
-  {
-    text: ">>> Игрок @ прошёл проверку НКВД",
-    value: "Прошёл НКВД"
-  },
-  {
-    text: ">>> Игрок @ прошёл обучение\n*Испытательный срок: `7 дней`\n\n* Требуется:\n * Выдать роли\n * Выдать ранг (`STEAMID` | `moderator`)\n<@&890637093003481138><@&890607376074412082>",
-    value: "Прошёл Обучение"
-  },
-  {
-    text: ">>> Кандидат на ЛС @ принят в отдел `OTDEL`\n* Причина: ` `\n*Ипытательный срок: `7 дней`\n\n* Требуется:\n * Выдать роли\n * Выдать ранг (`STEAMID` | `RANK`)\n<@&890637093003481138><@&890607376074412082>",
-    value: "Принят в отдел (ЛС-ВС)"
-  },
-  {
-    text: ">>> Модератор @ повышен до `RANG`\n* Требуется:\n * Выдать ранг `STEAMID`\n<@&890637093003481138><@&890607376074412082>",
-    value: "Повышен в ранге"
-  },
-  {
-    text: ">>> Модератор @ снят\n* Причина: ` `\n* Чёрный-Список: ` `\n\n* Статистика:\n * Наказания: ` `\n * Соц. рейтинг: ` `\n * ОВНДП: ` `\n * Жалоб: ` `\n * Часов: ` `",
-    value: "Снятие с поста"
-  },
-  {
-    text: ">>> Модератор @ получает **NUMBER устное предупреждение**\n* Причина: \`\`",
-    value: "Выдать уст. предупреждение"
-  },
-  {
-    text: ">>> Модератор @ получает **NUMBER  предупреждение(я)**\n* Причина: \`\`",
-    value: "Выдать предупреждение(я)"
-  },
-  {
-    text: ">>> Модератор @ снимает **NUMBER предупреждение(я)**\n* Причина: \`\`",
-    value: "Снять предупреждение(я)"
-  },
-  {
-    text: ">>> Модератор @ получает **NUMBER выговор(ы)**\n* Причина: \`\`",
-    value: "Выдать выговор(ы)"
-  },
-  {
-    text: ">>> Модератор @ снимает **NUMBER выговор(ы)**\n* Причина: \`\`",
-    value: "Снять выговор(ы)"
-  },
-  {
-    text: ">>> Модератор @ получает отпуск/заморозку (`полный/частичный`) с: **DATA** по: **DATA**\n* Причина: \`\`",
-    value: "Выдать отпуск / заморозку"
-  },
-  {
-    text: ">>> Модератор @ выходит с отпуска/заморозки\n* Причина: \`\`\n* Требуется занести в таблицу: Пинг сотрудников дневной/ночной администрации",
-    value: "Снять отпуск / заморозку"
-  },
-  {
-    text: ">>> Модератор @ получает **METKA** метку\n* Причина: \`\`",
-    value: "Выдать метку"
-  },
-  {
-    text: ">>> Модератор @ получает рекомендацию\n* Причина: \`\`",
-    value: "Выдать рекомендацию"
-  },
-  {
-    text: ">>> Модератор @ сгорает рекомендация\n* Причина: \`\`",
-    value: "Закончилась рекомендация"
-  },
-  {
-    text: ">>> @ +NUMBER рейтинга\n* Причина: \`\`",
-    value: "Выдать соц. рейтинг"
-  },
-  {
-    text: ">>> @ -NUMBER рейтинга\n* Причина: \`\`",
-    value: "Снять соц. рейтинг"
-  },
-  {
-    text: ">>> Модератор @ получает грань снятия с: **DATA** до: **DATA**\nПричина: \`\`",
-    value: "Выдать грань снятии"
-  },
-  // {
-  //   text: "---",
-  //   value: "Снять грань снятии"
-  // },
-  // {
-  //   text: "---",
-  //   value: "Отправляется в командировку"
-  // },
-  // {
-  //   text: "---",
-  //   value: "Возвращается с командировки"
-  // }
-];
+var Servers = []
+var Formats = [];
 
 function ShowFormModal({ rootProps }) {
+  const [server, setServer] = useState("");
   const [format, setFormat] = useState("");
+
   const [formatted, rendered] = useMemo(() => {
-    const selectedFormat = Formats.find((f) => f.value === format);
-    return [selectedFormat ? selectedFormat.text : "---", format];
+    const selectedFormat = Formats.find((f) => f.title === format);
+    return [(selectedFormat) ? selectedFormat.value : "---", format];
   }, [format]);
 
   return BdApi.React.createElement(
@@ -152,15 +64,15 @@ function ShowFormModal({ rootProps }) {
     ),
     BdApi.React.createElement(
       ModalContent,
-      { className: cl("modal-content") },
-      // BdApi.React.createElement(FormTitle, null, "Формы"),
-      BdApi.React.createElement(FormTitle, null, ""),
+      { className: cl("modal-content") }, BdApi.React.createElement(FormTitle, null, ""),
       BdApi.React.createElement(
         Select,
         {
+          placeholder: "Выберите форму",
           options: Formats.map((m) => ({
-            label: typeof m === "object" ? m.value : m,
-            value: typeof m === "object" ? m.value : m
+            label: typeof m === "object" ? m.title : m,
+            value: typeof m === "object" ? m.title : m,
+            disabled: typeof m === "object" ? m.disabled : m
           })),
           isSelected: (v) => format === v,
           select: (v) => setFormat(v),
@@ -170,12 +82,23 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => rendered
         }
       ),
-      // BdApi.React.createElement(FormTitle, { className: cl("preview-title") }, "Предварительный просмотр"),
-      // BdApi.React.createElement(
-      //   FormText,
-      //   { className: cl("preview-text") },
-      //   `${rendered || "---"} | ${formatted || "---"}`,
-      // )
+      (format == "Выдача банов") ? BdApi.React.createElement(
+        Select,
+        {
+          placeholder: "Выберите сервер",
+          options: Servers.map((m) => ({
+            label: typeof m === "object" ? m.name : m,
+            value: typeof m === "object" ? m.name : m,
+            disabled: typeof m === "object" ? m.disabled : m
+          })),
+          isSelected: (v) => server === v,
+          select: (v) => setServer(v),
+          serialize: (v) => v,
+          renderOptionLabel: (o) =>
+            BdApi.React.createElement("div", { className: cl("format-label") }, o.label),
+          renderOptionValue: () => server,
+        }
+      ) : null,
     ),
     BdApi.React.createElement(
       ModalFooter,
@@ -183,14 +106,14 @@ function ShowFormModal({ rootProps }) {
       BdApi.React.createElement(
         Button,
         {
-          disabled: (formatted == "---" || !formatted) ? true : false,
+          disabled: (formatted == "---" || !formatted) ? true : ((format == "Выдача банов") ? ((!server) ? true : false) : false),
           onClick: () => {
             const ComponentDispatch = BdApi.Webpack.getModule((m) => m.emitter?._events?.INSERT_TEXT, {
               searchExports: true
             });
             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-              rawText: formatted,
-              plainText: formatted
+              rawText: (format == "Выдача банов") ? formatted.replace("{{server}}", server).replace("{{timestamp}}", Math.floor(Date.now() / 1000)) : formatted,
+              plainText: (format == "Выдача банов") ? formatted.replace("{{server}}", server).replace("{{timestamp}}", Math.floor(Date.now() / 1000)) : formatted
             });
             rootProps.onClose();
           }
@@ -202,7 +125,7 @@ function ShowFormModal({ rootProps }) {
 }
 
 function ChatBarComponent() {
-  return BdApi.React.createElement(Tooltip, { text: "Выбрать форму" }, ({ onMouseEnter, onMouseLeave }) => BdApi.React.createElement("div", { style: { marginTop: 10 } }, BdApi.React.createElement(
+  return BdApi.React.createElement(Tooltip, { text: "Открыть панель форм" }, ({ onMouseEnter, onMouseLeave }) => BdApi.React.createElement("div", { style: { marginTop: 10 } }, BdApi.React.createElement(
     Button,
     {
       "aria-haspopup": "dialog",
@@ -298,7 +221,7 @@ function load() {
       if (response.statusCode == 200) {
         const versionData = JSON.parse(body.toString());
         
-        const old_version = config.version;
+        const old_version = config.version['base'];
         const new_version = versionData.versions['select-forms'];
         const changelogs = versionData.changelogs['select-forms'];
         if (old_version < new_version) {
@@ -336,6 +259,160 @@ function load() {
       }
     }
   );
+
+  
+  setTimeout(() => {
+    request.get(
+      config.urls[2],
+      (error, response, body) => {
+        if (error) {
+          BdApi.showToast(error, { type: "error" });
+          return;
+        }
+        
+        if (response.statusCode == 200) {
+          const result = JSON.parse(body.toString());
+
+          
+          const base = result['standart'].data;
+          const serv = result['servers'].data;
+
+          // console.log(JSON.stringify(serv));
+
+          for (let i = 0; i < base.length; i++) {
+            Formats.push({
+              "title": base[i]['title'],
+              "value": base[i]['value'],
+              "disabled": base[i]['disabled'],
+            });
+          }
+          for (let i = 0; i < serv.length; i++) {
+            Servers.push({
+              "name": serv[i]['name'],
+              "disabled": serv[i]['disabled'],
+            });
+          }
+
+          
+          // CUSTOM FORM`S
+          if (fs.existsSync(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json")) {
+            fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
+              if (err) {
+                setTimeout(() => {
+                  BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" })
+                }, 1500);
+                console.log(err);
+  
+                return;
+              }
+    
+              if (data == "{}" || !data) {
+                setTimeout(() => {
+                  BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
+                }, 1500);
+                
+                return;
+              } else {
+                const form = JSON.parse(data)['forms'];
+  
+                for (let i = 0; i < form.length; i++) {
+                  Formats.push({
+                    "title": form[i]['title'],
+                    "value": form[i]['value'],
+                    "disabled": form[i]['disabled'],
+                  });
+                }
+              }
+            });
+          } else {
+            const standartCustomForm = {
+              "forms": [
+                {
+                    "title": "Пример 1",
+                    "value": "Примерочная форма #1",
+                    "disabled": false
+                },
+                {
+                    "title": "Пример 2",
+                    "value": "Примерочная форма #2",
+                    "disabled": false
+                }
+              ]
+            }
+            
+            // LOAD CUSTOM FORM`S
+            fs.writeFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", JSON.stringify(standartCustomForm, null, 2), (err) => {
+              if (err) {
+                setTimeout(() => {
+                  BdApi.showToast("Ошибка при создании файла", { type: "error" })
+                }, 1500);
+                
+                return;
+              }
+
+              
+              BdApi.showToast("Файл конфигураций не найден! Начинаем создавать его..", { type: "warning" })
+            });
+
+            setTimeout(() => {
+              fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
+                if (err) {
+                  setTimeout(() => {
+                    BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" })
+                  }, 1500);
+                  console.log(err);
+    
+                  return;
+                }
+      
+                if (data == "{}" || !data) {
+                  setTimeout(() => {
+                    BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
+                  }, 1500);
+                  
+                  return;
+                } else {
+                  const form = JSON.parse(data)['forms'];
+    
+                  for (let i = 0; i < form.length; i++) {
+                    Formats.push({
+                      "title": form[i]['title'],
+                      "value": form[i]['value'],
+                      "disabled": form[i]['disabled'],
+                    });
+                  }
+                }
+              });
+            }, 150);
+          }
+
+          
+          setTimeout(() => {
+            BdApi.showToast("Все формы загружены!", { type: "info" });
+          }, 3000);
+        } else {
+          BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @kotyarakryt`, { type: "error" });
+        }
+      }
+    );
+  }, 100);
+}
+function getSettingsPanel() {
+    const SettingsPanel = document.createElement("div");
+    SettingsPanel.id = "my-settings";
+
+
+    const TextSetting = document.createElement("div");
+    TextSetting.classList.add("setting");
+
+    const TextLabel = document.createElement("p")
+    TextLabel.innerHTML = "<center style=\"color: #f8884d;\">Что-то будет..</center>";
+
+    TextSetting.append(TextLabel);
+
+
+    SettingsPanel.append(TextSetting);
+    return SettingsPanel;
 }
 
 var Chat = BdApi.Webpack.getModule((m) => m.Z?.type?.render?.toString().includes("chat input type must be set"));
@@ -364,5 +441,6 @@ function stop() {
 module.exports = _ => ({
   load,
   start,
-  stop
+  stop,
+  getSettingsPanel
 });
