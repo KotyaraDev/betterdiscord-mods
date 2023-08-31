@@ -136,12 +136,12 @@
                 "disabled": false
             },
             {
-                "name": "SCP RP",
-                "disabled": false
+                "name": "SCP RP | [ НЕДОСТУПНО ]",
+                "disabled": true
             },
             {
-                "name": "WW2 RP",
-                "disabled": false
+                "name": "WW2 RP | [ НЕДОСТУПНО ]",
+                "disabled": true
             },
             {
                 "name": "Тюрьма RP | [ НЕДОСТУПНО ]",
