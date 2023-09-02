@@ -45,13 +45,122 @@ var Servers = []
 var Formats = [];
 
 function ShowFormModal({ rootProps }) {
-  const [server, setServer] = useState("");
   const [format, setFormat] = useState("");
+  const [formReason, setReason] = useState("");
+  const [server, setServer] = useState("");
 
   const [formatted, rendered] = useMemo(() => {
     const selectedFormat = Formats.find((f) => f.title === format);
-    return [(selectedFormat) ? selectedFormat.value : "---", format];
+    return [(selectedFormat) ? selectedFormat : "---", format];
   }, [format]);
+
+
+  function getResult() {
+    var result = "---";
+
+
+    switch (format) {
+      case "Откат дейcтвия":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Принят в отдел (ЛС-ВС)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снятие с поста":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать устное(ые) предупреждение(я)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать предупреждение(я)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снять предупреждение(я)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать выговор(ы)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снять выговор(ы)":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать отпуск / заморозку":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снять отпуск / заморозку":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать метку":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать рекомендацию":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Закончилась рекомендация":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать соц. рейтинг":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снять соц. рейтинг":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Выдать грань снятии":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+      case "Снять грань снятии":
+      {
+        result = formatted.value.replace("{{reason}}", formReason);
+        break;
+      }
+
+      case "Выдача банов":
+      {
+        result = formatted.value.replace("{{server}}", server).replace("{{reason}}", formReason).replace("{{timestamp}}", Math.floor(Date.now() / 1000));
+        break;
+      }
+    
+      default:
+      {
+        result = formatted.value
+        break;
+      }
+    }
+
+    return result;
+  }
 
   return BdApi.React.createElement(
     ModalRoot,
@@ -82,6 +191,14 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => rendered
         }
       ),
+      (format == "Снятие с поста [BETA]") ? BdApi.React.createElement(
+        "input",
+        {
+          type: "text",
+          placeholder: "Введите причину",
+          onChange: (v) => setReason(v['target'].value),
+        }
+      ) : null,
       (format == "Выдача банов") ? BdApi.React.createElement(
         Select,
         {
@@ -106,14 +223,14 @@ function ShowFormModal({ rootProps }) {
       BdApi.React.createElement(
         Button,
         {
-          disabled: (formatted == "---" || !formatted) ? true : ((format == "Выдача банов") ? ((!server) ? true : false) : false),
+          disabled: (formatted.value == "---" || !formatted.value) ? true : ((format == "Выдача банов") ? ((!server) ? true : false) : false),
           onClick: () => {
             const ComponentDispatch = BdApi.Webpack.getModule((m) => m.emitter?._events?.INSERT_TEXT, {
               searchExports: true
             });
             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-              rawText: (format == "Выдача банов") ? formatted.replace("{{server}}", server).replace("{{timestamp}}", Math.floor(Date.now() / 1000)) : formatted,
-              plainText: (format == "Выдача банов") ? formatted.replace("{{server}}", server).replace("{{timestamp}}", Math.floor(Date.now() / 1000)) : formatted
+              rawText: getResult(),
+              plainText: getResult()
             });
             rootProps.onClose();
           }
@@ -227,12 +344,12 @@ function load() {
         if (old_version < new_version) {
           BdApi.showConfirmationModal(
             "SelectFormForAdminRank | Новое обновление!",
-            `Ваша версия: \`${old_version}\` | Новая версия: \`${new_version}\`\n\n \n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}`,
+            `Ваша версия: \`${old_version}\` | Новая версия: \`${new_version}\`\n\n \n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n \n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
             {
               confirmText: "Установить",
               cancelText: "Отменить",
               onConfirm: () => {
-                BdApi.showToast("Начинаем загрузку..", {type: "info"});
+                BdApi.showToast("Начинаем загрузку обновлений..", {type: "info"});
 
                 request.get(
                   config.urls[1],
@@ -272,6 +389,8 @@ function load() {
         
         if (response.statusCode == 200) {
           const result = JSON.parse(body.toString());
+          
+          BdApi.showToast("Начинаем загрузку форм..", {type: "info"});
 
           
           const base = result['standart'].data;
@@ -388,7 +507,7 @@ function load() {
 
           
           setTimeout(() => {
-            BdApi.showToast("Все формы загружены!", { type: "info" });
+            BdApi.showToast("Все формы загружены!", { type: "success" });
           }, 3000);
         } else {
           BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @kotyarakryt`, { type: "error" });
