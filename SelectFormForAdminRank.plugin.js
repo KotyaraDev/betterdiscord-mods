@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.4
+ * @version 1.4.1
  */
 
 "use strict";
@@ -15,7 +15,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.4",
+    "base": "1.4.1",
   },
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
@@ -55,107 +55,211 @@ function ShowFormModal({ rootProps }) {
   }, [format]);
 
 
-  function getResult() {
-    var result = "---";
+  function getResult(type = false) {
 
+    if (type) {
+      var result = "---";
 
-    switch (format) {
-      case "Откат дейcтвия":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
+      switch (format) {
+        case "Откат дейcтвия":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Принят в отдел (ЛС-ВС)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снятие с поста":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать устное(ые) предупреждение(я)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать предупреждение(я)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снять предупреждение(я)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать выговор(ы)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снять выговор(ы)":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать отпуск / заморозку":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снять отпуск / заморозку":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать метку":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать рекомендацию":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Закончилась рекомендация":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать соц. рейтинг":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снять соц. рейтинг":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Выдать грань снятии":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+        case "Снять грань снятии":
+        {
+          result = formatted.value.replace("{{reason}}", formReason);
+          break;
+        }
+  
+        case "Выдача банов":
+        {
+          result = formatted.value.replace("{{server}}", server).replace("{{reason}}", formReason).replace("{{timestamp}}", Math.floor(Date.now() / 1000));
+          break;
+        }
+      
+        default:
+        {
+          result = formatted.value
+          break;
+        }
       }
-      case "Принят в отдел (ЛС-ВС)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снятие с поста":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать устное(ые) предупреждение(я)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать предупреждение(я)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снять предупреждение(я)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать выговор(ы)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снять выговор(ы)":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать отпуск / заморозку":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снять отпуск / заморозку":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать метку":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать рекомендацию":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Закончилась рекомендация":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать соц. рейтинг":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снять соц. рейтинг":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Выдать грань снятии":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
-      case "Снять грань снятии":
-      {
-        result = formatted.value.replace("{{reason}}", formReason);
-        break;
-      }
+    } else {
+      var result = false;
 
-      case "Выдача банов":
-      {
-        result = formatted.value.replace("{{server}}", server).replace("{{reason}}", formReason).replace("{{timestamp}}", Math.floor(Date.now() / 1000));
-        break;
-      }
-    
-      default:
-      {
-        result = formatted.value
-        break;
+      switch (format) {
+        case "Откат дейcтвия":
+        {
+          result = true;
+          break;
+        }
+        case "Принят в отдел (ЛС-ВС)":
+        {
+          result = true;
+          break;
+        }
+        case "Снятие с поста":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать устное(ые) предупреждение(я)":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать предупреждение(я)":
+        {
+          result = true;
+          break;
+        }
+        case "Снять предупреждение(я)":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать выговор(ы)":
+        {
+          result = true;
+          break;
+        }
+        case "Снять выговор(ы)":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать отпуск / заморозку":
+        {
+          result = true;
+          break;
+        }
+        case "Снять отпуск / заморозку":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать метку":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать рекомендацию":
+        {
+          result = true;
+          break;
+        }
+        case "Закончилась рекомендация":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать соц. рейтинг":
+        {
+          result = true;
+          break;
+        }
+        case "Снять соц. рейтинг":
+        {
+          result = true;
+          break;
+        }
+        case "Выдать грань снятии":
+        {
+          result = true;
+          break;
+        }
+        case "Снять грань снятии":
+        {
+          result = true;
+          break;
+        }
+
+        case "Выдача банов":
+        {
+          result = true;
+          break;
+        }
+      
+        default:
+        {
+          result = false;
+          break;
+        }
       }
     }
 
@@ -191,7 +295,7 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => rendered
         }
       ),
-      (format == "Снятие с поста [BETA]") ? BdApi.React.createElement(
+      (getResult()) ? BdApi.React.createElement(
         "input",
         {
           type: "text",
@@ -229,8 +333,8 @@ function ShowFormModal({ rootProps }) {
               searchExports: true
             });
             ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", {
-              rawText: getResult(),
-              plainText: getResult()
+              rawText: getResult(true),
+              plainText: getResult(true)
             });
             rootProps.onClose();
           }
