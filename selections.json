@@ -239,5 +239,34 @@
                 "disabled": true
             }
         ]
+    },
+
+    "mark": {
+        "data": [
+            {
+                "name": "+50",
+                "disabled": false
+            },
+            {
+                "name": "+100",
+                "disabled": false
+            },
+            {
+                "name": "+150",
+                "disabled": false
+            },
+            {
+                "name": "+250",
+                "disabled": false
+            },
+            {
+                "name": "+300",
+                "disabled": false
+            },
+            {
+                "name": "+500",
+                "disabled": false
+            }
+        ]
     }
 }
