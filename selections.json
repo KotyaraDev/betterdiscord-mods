@@ -83,7 +83,7 @@
             },
             {
                 "title": "Выдать метку",
-                "value": "> {{post}} @ получает **METKA** метку\n> Причина: `{{reason}}`",
+                "value": "> {{post}} @ получает **{{mark}}** метку\n> Причина: `{{reason}}`",
                 "disabled": false
             },
             {

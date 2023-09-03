@@ -1,8 +1,8 @@
 {
   "versions": {
-    "select-forms": "1.5.1"
+    "select-forms": "1.5.2"
   },
   "changelogs": {
-    "select-forms": "1. Исправление ошибок"
+    "select-forms": "1. Добавлена возможность выбора меток"
   }
 }

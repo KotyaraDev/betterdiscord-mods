@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.5.1
+ * @version 1.5.2
  */
 
 "use strict";
@@ -15,7 +15,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.5.1",
+    "base": "1.5.2",
   },
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
@@ -54,6 +54,7 @@ function ShowFormModal({ rootProps }) {
   const [server, setServer] = useState("");
   const [post, setPost] = useState("");
   const [rank, setRank] = useState("");
+  const [mark, setMark] = useState("");
   const [formReason, setReason] = useState("");
 
   const [formatted, rendered] = useMemo(() => {
@@ -139,7 +140,7 @@ function ShowFormModal({ rootProps }) {
         }
         case "Выдать метку":
         {
-          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{mark}}", mark).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать рекомендацию":
@@ -370,6 +371,23 @@ function ShowFormModal({ rootProps }) {
           renderOptionLabel: (o) =>
             BdApi.React.createElement("div", { className: cl("format-label") }, o.label),
           renderOptionValue: () => rank,
+        }
+      ) : null,
+      (format == "Выдать метку") ? BdApi.React.createElement(
+        Select,
+        {
+          placeholder: "Выберите метку",
+          options: Mark.map((m) => ({
+            label: typeof m === "object" ? m.name : m,
+            value: typeof m === "object" ? m.name : m,
+            disabled: typeof m === "object" ? m.disabled : m
+          })),
+          isSelected: (v) => mark === v,
+          select: (v) => setMark(v),
+          serialize: (v) => v,
+          renderOptionLabel: (o) =>
+            BdApi.React.createElement("div", { className: cl("format-label") }, o.label),
+          renderOptionValue: () => mark,
         }
       ) : null,
       (getResult()) ? BdApi.React.createElement(
