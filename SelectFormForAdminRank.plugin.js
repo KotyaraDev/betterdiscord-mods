@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.4.1
+ * @version 1.5
  */
 
 "use strict";
@@ -15,7 +15,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.4.1",
+    "base": "1.5",
   },
   urls: [
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
@@ -23,6 +23,7 @@ const config = {
     "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/selections.json",
   ],
 }
+const Settings = {customForms: true};
 
 var { useState, useMemo } = BdApi.React;
 var {
@@ -41,13 +42,18 @@ var {
 
 var ButtonWrapperClasses = BdApi.Webpack.getModule((m) => m.buttonWrapper && m.buttonContent);
 var cl = (...names) => names.map((n) => `vbd-its-${n}`).join(" ");
-var Servers = []
 var Formats = [];
+var Servers = [];
+var Post = [];
+var Rank = [];
+let checkUpdateIntervalID;
 
 function ShowFormModal({ rootProps }) {
   const [format, setFormat] = useState("");
-  const [formReason, setReason] = useState("");
   const [server, setServer] = useState("");
+  const [post, setPost] = useState("");
+  const [rank, setRank] = useState("");
+  const [formReason, setReason] = useState("");
 
   const [formatted, rendered] = useMemo(() => {
     const selectedFormat = Formats.find((f) => f.title === format);
@@ -56,7 +62,6 @@ function ShowFormModal({ rootProps }) {
 
 
   function getResult(type = false) {
-
     if (type) {
       var result = "---";
 
@@ -68,62 +73,62 @@ function ShowFormModal({ rootProps }) {
         }
         case "Принят в отдел (ЛС-ВС)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason).replace("{{rank}}", rank);
           break;
         }
         case "Снятие с поста":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать устное(ые) предупреждение(я)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать предупреждение(я)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Снять предупреждение(я)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать выговор(ы)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Снять выговор(ы)":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
-        case "Выдать отпуск / заморозку":
+        case "Выдать отпуск":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
-        case "Снять отпуск / заморозку":
+        case "Снять отпуск":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать метку":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать рекомендацию":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
-        case "Закончилась рекомендация":
+        case "Сгорает рекомендация":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Выдать соц. рейтинг":
@@ -138,12 +143,12 @@ function ShowFormModal({ rootProps }) {
         }
         case "Выдать грань снятии":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
         case "Снять грань снятии":
         {
-          result = formatted.value.replace("{{reason}}", formReason);
+          result = formatted.value.replace("{{post}}", post).replace("{{reason}}", formReason);
           break;
         }
   
@@ -203,12 +208,12 @@ function ShowFormModal({ rootProps }) {
           result = true;
           break;
         }
-        case "Выдать отпуск / заморозку":
+        case "Выдать отпуск":
         {
           result = true;
           break;
         }
-        case "Снять отпуск / заморозку":
+        case "Снять отпуск":
         {
           result = true;
           break;
@@ -295,14 +300,6 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => rendered
         }
       ),
-      (getResult()) ? BdApi.React.createElement(
-        "input",
-        {
-          type: "text",
-          placeholder: "Введите причину",
-          onChange: (v) => setReason(v['target'].value),
-        }
-      ) : null,
       (format == "Выдача банов") ? BdApi.React.createElement(
         Select,
         {
@@ -320,6 +317,48 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => server,
         }
       ) : null,
+      (format && (format != "Принят на Модератора" && format != "Откат дейcтвия" && format != "Выдать соц. рейтинг" && format != "Снять соц. рейтинг" && format != "Выдача банов")) ? BdApi.React.createElement(
+        Select,
+        {
+          placeholder: "Выберите должность человека",
+          options: Post.map((m) => ({
+            label: typeof m === "object" ? m.name : m,
+            value: typeof m === "object" ? m.name : m,
+            disabled: typeof m === "object" ? m.disabled : m
+          })),
+          isSelected: (v) => post === v,
+          select: (v) => setPost(v),
+          serialize: (v) => v,
+          renderOptionLabel: (o) =>
+            BdApi.React.createElement("div", { className: cl("format-label") }, o.label),
+          renderOptionValue: () => post,
+        }
+      ) : null,
+      (format == "Прошёл обучение" || format == "Повышен в ранге" || format == "Принят в отдел (ЛС-ВС)") ? BdApi.React.createElement(
+        Select,
+        {
+          placeholder: "Выберите ранг",
+          options: Rank.map((m) => ({
+            label: typeof m === "object" ? m.name : m,
+            value: typeof m === "object" ? m.name : m,
+            disabled: typeof m === "object" ? m.disabled : m
+          })),
+          isSelected: (v) => rank === v,
+          select: (v) => setRank(v),
+          serialize: (v) => v,
+          renderOptionLabel: (o) =>
+            BdApi.React.createElement("div", { className: cl("format-label") }, o.label),
+          renderOptionValue: () => rank,
+        }
+      ) : null,
+      (getResult()) ? BdApi.React.createElement(
+        "input",
+        {
+          type: "text",
+          placeholder: "Введите причину",
+          onChange: (v) => setReason(v['target'].value),
+        }
+      ) : null,
     ),
     BdApi.React.createElement(
       ModalFooter,
@@ -327,7 +366,7 @@ function ShowFormModal({ rootProps }) {
       BdApi.React.createElement(
         Button,
         {
-          disabled: (formatted.value == "---" || !formatted.value) ? true : ((format == "Выдача банов") ? ((!server) ? true : false) : false),
+          disabled: ((formatted.value == "---" || !formatted.value) ? true : false),
           onClick: () => {
             const ComponentDispatch = BdApi.Webpack.getModule((m) => m.emitter?._events?.INSERT_TEXT, {
               searchExports: true
@@ -340,6 +379,71 @@ function ShowFormModal({ rootProps }) {
           }
         },
         "Вставить"
+      )
+    )
+  );
+}
+
+
+function ShowCreateFormModal({ rootProps }) {
+  const [name, setName] = useState("");
+  const [format, setFormat] = useState("");
+
+  return BdApi.React.createElement(
+    ModalRoot,
+    { ...rootProps },
+    BdApi.React.createElement(
+      ModalHeader,
+      { className: cl("modal-header") },
+      BdApi.React.createElement(FormTitle, { tag: "h2" }, "Создание новой формы"),
+      BdApi.React.createElement(ModalCloseButton, { onClick: rootProps.onClose })
+    ),
+    BdApi.React.createElement(
+      ModalContent,
+      { className: cl("modal-content") }, BdApi.React.createElement(FormTitle, null, ""),
+      BdApi.React.createElement(
+        "input",
+        {
+          type: "text",
+          placeholder: "Введите название формы",
+          onChange: (v) => setName(v['target'].value),
+        }
+      ),
+      BdApi.React.createElement(
+        "input",
+        {
+          type: "text",
+          placeholder: "Введите текст формы (Можно использовать форматирование дискорда, а так-же для переноса строки используйте \"\n\"",
+          onChange: (v) => setFormat(v['target'].value),
+        }
+      )
+    ),
+    BdApi.React.createElement(
+      ModalFooter,
+      null,
+      BdApi.React.createElement(
+        Button,
+        {
+          disabled: ((!name || !format) ? true : false),
+          onClick: () => {
+            const customFormFields = BdApi.getData("SelectFormForAdminRank", "forms");
+            const newForm = {
+                title: name,
+                value: format,
+                disabled: false,
+            };
+            customFormFields.push(newForm);
+            BdApi.setData("SelectFormForAdminRank", "forms", customFormFields);
+            rootProps.onClose();
+            
+            BdApi.showToast("Начинаем перезагружать кастомные формы\nПожалуйста подождите..", {type: "info"});
+
+            setTimeout(() => {
+              loadCustomForms(true);
+            }, 5000);
+          }
+        },
+        "Создать"
       )
     )
   );
@@ -375,6 +479,61 @@ function findInReactTree(root, filter) {
   return BdApi.Utils.findInTree(root, filter, {
     walkable: ["children", "props"]
   });
+}
+
+function checkUpdate(curr_version, thisIsIntervalCheck = false) {
+  request.get(
+    config.urls[0],
+    (error, response, body) => {
+      if (error) {
+        BdApi.showToast(error, { type: "error" });
+        return;
+      }
+      
+      if (response.statusCode == 200) {
+        const versionData = JSON.parse(body.toString());
+        
+        const new_version = versionData.versions['select-forms'];
+        const changelogs = versionData.changelogs['select-forms'];
+        if (curr_version < new_version) {
+          BdApi.showConfirmationModal(
+            "SelectFormForAdminRank | Новое обновление!",
+            `Ваша версия: \`${curr_version}\` | Новая версия: \`${new_version}\`\n\n \n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n \n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
+            {
+              confirmText: "Установить",
+              cancelText: "Отменить",
+              onConfirm: () => {
+                BdApi.showToast("Начинаем загрузку обновлений..", {type: "info"});
+
+                request.get(
+                  config.urls[1],
+                  (error, response, body) => {
+                    if (error) {
+                      BdApi.showToast(`Ошибка при загрузка: ${error}`, { type: "error" });
+                      return false;
+                    }
+
+                    if (response.statusCode == 200) {
+                      fs.writeFileSync(
+                        path.join(BdApi.Plugins.folder, "SelectFormForAdminRank.plugin.js"),
+                        body
+                      );
+                      
+                      BdApi.showToast(`Обновление загружено!`, { type: "success" });
+                    } else BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
+                  }
+                );
+              }
+            }
+          );
+        } else {
+          if (thisIsIntervalCheck) {
+            BdApi.showToast("Обновлений не найдено, пожалуйста попробуйте позже!", { type: "error" });
+          }
+        }
+      }
+    }
+  );
 }
 
 var styles_default = `.vbd-its-modal-content input {
@@ -431,55 +590,7 @@ var styles_default = `.vbd-its-modal-content input {
 `;
 
 function load() {
-  request.get(
-    config.urls[0],
-    (error, response, body) => {
-      if (error) {
-        BdApi.showToast(error, { type: "error" });
-        return;
-      }
-      
-      if (response.statusCode == 200) {
-        const versionData = JSON.parse(body.toString());
-        
-        const old_version = config.version['base'];
-        const new_version = versionData.versions['select-forms'];
-        const changelogs = versionData.changelogs['select-forms'];
-        if (old_version < new_version) {
-          BdApi.showConfirmationModal(
-            "SelectFormForAdminRank | Новое обновление!",
-            `Ваша версия: \`${old_version}\` | Новая версия: \`${new_version}\`\n\n \n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n \n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
-            {
-              confirmText: "Установить",
-              cancelText: "Отменить",
-              onConfirm: () => {
-                BdApi.showToast("Начинаем загрузку обновлений..", {type: "info"});
-
-                request.get(
-                  config.urls[1],
-                  (error, response, body) => {
-                    if (error) {
-                      BdApi.showToast(`Ошибка при загрузка: ${error}`, { type: "error" });
-                      return;
-                    }
-
-                    if (response.statusCode == 200) {
-                      fs.writeFileSync(
-                        path.join(BdApi.Plugins.folder, "SelectFormForAdminRank.plugin.js"),
-                        body
-                      );
-                      
-                      BdApi.showToast(`Обновление загружено!`, { type: "success" });
-                    } else BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
-                  }
-                );
-              }
-            }
-          );
-        }
-      }
-    }
-  );
+  checkUpdate(config.version['base']);
 
   
   setTimeout(() => {
@@ -493,30 +604,48 @@ function load() {
         
         if (response.statusCode == 200) {
           const result = JSON.parse(body.toString());
+          const base = (result['standart']) ? result['standart'].data : 0;
+          const serv = (result['servers']) ? result['servers'].data : 0;
+          const post = (result['post']) ? result['post'].data : 0;
+          const rank = (result['rank']) ? result['rank'].data : 0;
+
           
           BdApi.showToast("Начинаем загрузку форм..", {type: "info"});
 
-          
-          const base = result['standart'].data;
-          const serv = result['servers'].data;
-
-          // console.log(JSON.stringify(serv));
-
-          for (let i = 0; i < base.length; i++) {
-            Formats.push({
-              "title": base[i]['title'],
-              "value": base[i]['value'],
-              "disabled": base[i]['disabled'],
-            });
+          if (base.length > 0) {
+            for (let i = 0; i < base.length; i++) {
+              Formats.push({
+                "title": base[i]['title'],
+                "value": base[i]['value'],
+                "disabled": base[i]['disabled'],
+              });
+            }
           }
-          for (let i = 0; i < serv.length; i++) {
-            Servers.push({
-              "name": serv[i]['name'],
-              "disabled": serv[i]['disabled'],
-            });
+          if (serv.length > 0) {
+            for (let i = 0; i < serv.length; i++) {
+              Servers.push({
+                "name": serv[i]['name'],
+                "disabled": serv[i]['disabled'],
+              });
+            }
+          }
+          if (post.length > 0) {
+            for (let i = 0; i < post.length; i++) {
+              Post.push({
+                "name": post[i]['name'],
+                "disabled": post[i]['disabled'],
+              });
+            }
+          }
+          if (rank.length > 0) {
+            for (let i = 0; i < rank.length; i++) {
+              Rank.push({
+                "name": rank[i]['name'],
+                "disabled": rank[i]['disabled'],
+              });
+            }
           }
 
-          
           // CUSTOM FORM`S
           if (fs.existsSync(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json")) {
             fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
@@ -529,7 +658,7 @@ function load() {
                 return;
               }
     
-              if (data == "{}" || !data) {
+              if (data == "{}" || data['forms'] == "[]" || !data) {
                 setTimeout(() => {
                   BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
                 }, 1500);
@@ -538,65 +667,7 @@ function load() {
               } else {
                 const form = JSON.parse(data)['forms'];
   
-                for (let i = 0; i < form.length; i++) {
-                  Formats.push({
-                    "title": form[i]['title'],
-                    "value": form[i]['value'],
-                    "disabled": form[i]['disabled'],
-                  });
-                }
-              }
-            });
-          } else {
-            const standartCustomForm = {
-              "forms": [
-                {
-                    "title": "Пример 1",
-                    "value": "Примерочная форма #1",
-                    "disabled": false
-                },
-                {
-                    "title": "Пример 2",
-                    "value": "Примерочная форма #2",
-                    "disabled": false
-                }
-              ]
-            }
-            
-            // LOAD CUSTOM FORM`S
-            fs.writeFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", JSON.stringify(standartCustomForm, null, 2), (err) => {
-              if (err) {
-                setTimeout(() => {
-                  BdApi.showToast("Ошибка при создании файла", { type: "error" })
-                }, 1500);
-                
-                return;
-              }
-
-              
-              BdApi.showToast("Файл конфигураций не найден! Начинаем создавать его..", { type: "warning" })
-            });
-
-            setTimeout(() => {
-              fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
-                if (err) {
-                  setTimeout(() => {
-                    BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" })
-                  }, 1500);
-                  console.log(err);
-    
-                  return;
-                }
-      
-                if (data == "{}" || !data) {
-                  setTimeout(() => {
-                    BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
-                  }, 1500);
-                  
-                  return;
-                } else {
-                  const form = JSON.parse(data)['forms'];
-    
+                if (form.length > 0) {
                   for (let i = 0; i < form.length; i++) {
                     Formats.push({
                       "title": form[i]['title'],
@@ -605,8 +676,10 @@ function load() {
                     });
                   }
                 }
-              });
-            }, 150);
+              }
+            });
+          } else {
+            loadCustomForms(true);
           }
 
           
@@ -620,50 +693,192 @@ function load() {
     );
   }, 100);
 }
-function getSettingsPanel() {
-    const SettingsPanel = document.createElement("div");
-    SettingsPanel.id = "my-settings";
 
+function loadCustomForms(notify = false) {
+  const standartCustomForm = {
+    "forms": [
+      {
+          "title": "Пример 1",
+          "value": "Примерочная форма #1",
+          "disabled": false
+      },
+      {
+          "title": "Пример 2",
+          "value": "Примерочная форма #2",
+          "disabled": false
+      }
+    ]
+  }
+  
+  // LOAD CUSTOM FORM`S
+  if (!fs.existsSync(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json")) {
+    fs.writeFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", JSON.stringify(standartCustomForm, null, 2), (err) => {
+      if (err) {
+        setTimeout(() => {
+          if (notify) {
+            BdApi.showToast("Ошибка при создании файла", { type: "error" });
+          }
+        }, 1500);
+        
+        return false;
+      }
 
-    const TextSetting = document.createElement("div");
-    TextSetting.classList.add("setting");
+      
+      if (notify) {
+        BdApi.showToast("Файл конфигураций не найден! Начинаем создавать его..", { type: "warning" });
+      }
 
-    const TextLabel = document.createElement("p")
-    TextLabel.innerHTML = "<center style=\"color: #f8884d;\">Что-то будет..</center>";
+      return false;
+    });
+  } else {
+    setTimeout(() => {
+      fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
+        if (err) {
+          setTimeout(() => {
+            if (notify) {
+              BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" });
+            }
+          }, 1500);
+          console.log(err);
+  
+          return;
+        }
+  
+        if (data == "{}" || data['forms'] == "[]" || !data ) {
+          setTimeout(() => {
+            if (notify) {
+              BdApi.showToast("Кастомные форма не настроены!", { type: "error" });
+            }
+          }, 1500);
+          
+          return;
+        } else {
+          const form = JSON.parse(data)['forms'];
+  
+          if (form.length > 0) {
+            for (let i = 0; i < form.length; i++) {
+              Formats.push({
+                "title": form[i]['title'],
+                "value": form[i]['value'],
+                "disabled": form[i]['disabled'],
+              });
+            }
+          }
+        }
+      });
+    }, 150);
+  
+    if(notify) {
+      setTimeout(() => {
+        BdApi.showToast("Кастомные форма успешно загружены!", { type: "success" });
+      }, 500);
+    }
 
-    TextSetting.append(TextLabel);
+    return true;
+  }
+}
 
-
-    SettingsPanel.append(TextSetting);
-    return SettingsPanel;
+function clearFormData() {
+  const customFormFields = BdApi.getData("SelectFormForAdminRank", "forms");
+  if (Array.isArray(customFormFields)) {
+    customFormFields.length = 0;
+    BdApi.setData("SelectFormForAdminRank", "forms", customFormFields);
+  }
+  BdApi.showToast("Все кастомные форма были очищены!", { type: "warning" });
+  setTimeout(() => {
+    loadCustomForms(true);
+  }, 1000);
 }
 
 var Chat = BdApi.Webpack.getModule((m) => m.Z?.type?.render?.toString().includes("chat input type must be set"));
-function start() {
-  BdApi.DOM.addStyle("vbd-st", styles_default);
-  BdApi.Patcher.after("vbd-st", Chat.Z.type, "render", (_this, _args, res) => {
-    const chatBar = findInReactTree(
-      res,
-      (n) => Array.isArray(n?.children) && n.children.some((c) => c?.props?.className?.startsWith("attachButton"))
-    )?.children;
-    if (!chatBar) {
-      console.error("SelectFormForAdminRank: Couldn't find ChatBar component in React tree");
-      return;
-    }
-    const buttons = findInReactTree(chatBar, (n) => n?.props?.showCharacterCount);
-    if (buttons?.props.disabled)
-      return;
-    chatBar.splice(-1, 0, BdApi.React.createElement(ChatBarComponent, null));
-  });
-}
-function stop() {
-  BdApi.DOM.removeStyle("vbd-st");
-  BdApi.Patcher.unpatchAll("vbd-st");
-}
 
-module.exports = _ => ({
-  load,
-  start,
-  stop,
-  getSettingsPanel
-});
+module.exports = meta => {
+
+  return {
+    load,
+    start: () => {
+      Object.assign(Settings, BdApi.Data.load(meta.name, "settings"));
+
+      BdApi.DOM.addStyle("vbd-st", styles_default);
+      BdApi.Patcher.after("vbd-st", Chat.Z.type, "render", (_this, _args, res) => {
+        const chatBar = findInReactTree(
+          res,
+          (n) => Array.isArray(n?.children) && n.children.some((c) => c?.props?.className?.startsWith("attachButton"))
+        )?.children;
+        if (!chatBar) {
+          console.error("SelectFormForAdminRank: Couldn't find ChatBar component in React tree");
+          return;
+        }
+        const buttons = findInReactTree(chatBar, (n) => n?.props?.showCharacterCount);
+        if (buttons?.props.disabled)
+          return;
+        chatBar.splice(-1, 0, BdApi.React.createElement(ChatBarComponent, null));
+      });
+    },
+    stop: () => {
+      BdApi.DOM.removeStyle("vbd-st");
+      BdApi.Patcher.unpatchAll("vbd-st");
+
+      clearInterval(checkUpdateIntervalID);
+    },
+    getSettingsPanel: () => {
+      const SettingsPanel = document.createElement("div");
+      SettingsPanel.style.textAlign = "center";
+      SettingsPanel.id = "settings";
+  
+      const createFormButton = document.createElement("button");
+      createFormButton.style.position = "relative";
+      createFormButton.style.background = "#444";
+      createFormButton.style.color = "#fff";
+      createFormButton.style.textDecoration = "none";
+      createFormButton.style.textTransform = "uppercase";
+      createFormButton.style.border = "none";
+      createFormButton.style.borderRadius = "5px";
+      createFormButton.style.letterSpacing = "0.1rem";
+      createFormButton.style.fontSize = "1rem";
+      createFormButton.style.padding = "1rem 3rem";
+      createFormButton.style.transition = "0.2s";
+      createFormButton.textContent = "Создать новую форму";
+      // TODO: Доработать функцию, исправить баг с дублированием прошлых форм
+      // createFormButton.addEventListener("click", () => openModal((props) => BdApi.React.createElement(ShowCreateFormModal, { rootProps: props })));
+      SettingsPanel.appendChild(createFormButton);
+
+  
+      const deleteFormButton = document.createElement("button");
+      deleteFormButton.style.position = "relative";
+      deleteFormButton.style.background = "#4a0000";
+      deleteFormButton.style.color = "#fff";
+      deleteFormButton.style.textDecoration = "none";
+      deleteFormButton.style.textTransform = "uppercase";
+      deleteFormButton.style.border = "none";
+      deleteFormButton.style.borderRadius = "5px";
+      deleteFormButton.style.letterSpacing = "0.1rem";
+      deleteFormButton.style.fontSize = "1rem";
+      deleteFormButton.style.padding = "1rem 3rem";
+      deleteFormButton.style.marginTop = "5px";
+      deleteFormButton.textContent = "Очистить всех кастомные формы";
+      deleteFormButton.addEventListener("click", () => clearFormData());
+      SettingsPanel.appendChild(deleteFormButton);
+
+  
+      const checkUpdateFormButton = document.createElement("button");
+      checkUpdateFormButton.style.position = "relative";
+      checkUpdateFormButton.style.background = "#005089";
+      checkUpdateFormButton.style.color = "#fff";
+      checkUpdateFormButton.style.textDecoration = "none";
+      checkUpdateFormButton.style.textTransform = "uppercase";
+      checkUpdateFormButton.style.border = "none";
+      checkUpdateFormButton.style.borderRadius = "5px";
+      checkUpdateFormButton.style.letterSpacing = "0.1rem";
+      checkUpdateFormButton.style.fontSize = "1rem";
+      checkUpdateFormButton.style.padding = "1rem 3rem";
+      checkUpdateFormButton.style.marginTop = "15px";
+      checkUpdateFormButton.textContent = "Проверить на наличие обновлений";
+      checkUpdateFormButton.addEventListener("click", () => checkUpdate(config.version['base'], true));
+      SettingsPanel.appendChild(checkUpdateFormButton);
+      
+
+      return SettingsPanel;
+    }  
+  }
+};
