@@ -153,7 +153,89 @@
                 "disabled": true
             },
             {
-                "name": "Cyberpunk RP | НЕДОСТУПНО",
+                "name": "Cyberpunk RP | НЕДОСТУПНО (НАВСЕГДА)",
+                "disabled": true
+            }
+        ]
+    },
+
+    "post": {
+        "data": [
+            {
+                "name": "Игрок",
+                "disabled": false
+            },
+            {
+                "name": "Модератор",
+                "disabled": false
+            },
+            {
+                "name": "Администратор",
+                "disabled": false
+            },
+            {
+                "name": "Администратор Повышенной Категории",
+                "disabled": false
+            },
+            {
+                "name": "Кандидат на ЛС",
+                "disabled": false
+            },
+            {
+                "name": "Личный-состав",
+                "disabled": false
+            },
+            {
+                "name": "Высший-Состав",
+                "disabled": false
+            },
+            {
+                "name": "Заместитель Менеджера | НЕДОСТУПНО",
+                "disabled": true
+            },
+            {
+                "name": "Менеджер | НЕДОСТУПНО",
+                "disabled": true
+            }
+        ]
+    },
+
+    "rank": {
+        "data": [
+            {
+                "name": "user",
+                "disabled": false
+            },
+            {
+                "name": "vip",
+                "disabled": false
+            },
+            {
+                "name": "moderator",
+                "disabled": false
+            },
+            {
+                "name": "administrator",
+                "disabled": false
+            },
+            {
+                "name": "headadmin",
+                "disabled": false
+            },
+            {
+                "name": "supadmin",
+                "disabled": false
+            },
+            {
+                "name": "globaladmin",
+                "disabled": false
+            },
+            {
+                "name": "root | НЕДОСТУПНО",
+                "disabled": true
+            },
+            {
+                "name": "superadmin | НЕДОСТУПНО",
                 "disabled": true
             }
         ]
