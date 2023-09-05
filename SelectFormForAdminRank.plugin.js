@@ -6,7 +6,7 @@
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @updateUrl https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.5.2
+ * @version 1.6
  */
 
 "use strict";
@@ -15,15 +15,11 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.5.2",
+    "base": "1.6",
   },
-  urls: [
-    "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/configs.json",
-    "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/SelectFormForAdminRank.plugin.js",
-    "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main/selections.json",
-  ],
+  base_url: "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main",
 }
-const Settings = {customForms: true};
+const PluginSettings = {UpdateSystem: true};
 
 var { useState, useMemo } = BdApi.React;
 var {
@@ -444,17 +440,28 @@ function ShowCreateFormModal({ rootProps }) {
         "input",
         {
           type: "text",
-          placeholder: "Введите название формы",
+          placeholder: "Введите название формы (ДОЛЖНО БЫТЬ УНИКАЛЬНЫМ!)",
           onChange: (v) => setName(v['target'].value),
         }
       ),
       BdApi.React.createElement(
-        "input",
+        "div",
         {
-          type: "text",
-          placeholder: "Введите текст формы (Можно использовать форматирование дискорда, а так-же для переноса строки используйте \"\n\"",
-          onChange: (v) => setFormat(v['target'].value),
-        }
+          className: "markdown",
+          style: {
+            
+            padding: "10px",
+            borderRadius: "5px",
+            marginButton: "1rem",
+            width: "386px",
+            height: "500px",
+            whiteSpace: "pre-wrap",
+            background: "#1E1F22",
+            color: "#D1D4D7",
+          },
+          contentEditable: true,
+          onInput: (e) => setFormat(e.target.innerText),
+        }, "Введите текст формы (доступно использования форматирования дискорд, так-же для переноса строки используйте клавишу ` Space `(Пробел))"
       )
     ),
     BdApi.React.createElement(
@@ -478,8 +485,12 @@ function ShowCreateFormModal({ rootProps }) {
             BdApi.showToast("Начинаем перезагружать кастомные формы\nПожалуйста подождите..", {type: "info"});
 
             setTimeout(() => {
-              loadCustomForms(true);
-            }, 5000);
+              loadForms(true);
+
+              setTimeout(() => {
+                loadCustomForms(true);
+              }, 1500);
+            }, 2500);
           }
         },
         "Создать"
@@ -522,58 +533,75 @@ function findInReactTree(root, filter) {
 
 function checkUpdate(curr_version, thisIsIntervalCheck = false) {
   request.get(
-    config.urls[0],
+    config.base_url+"/configs.dev.json",
     (error, response, body) => {
       if (error) {
         BdApi.showToast(error, { type: "error" });
         return;
       }
-      
+
       if (response.statusCode == 200) {
         const versionData = JSON.parse(body.toString());
-        
-        const new_version = versionData.versions['select-forms'];
-        const changelogs = versionData.changelogs['select-forms'];
-        if (curr_version < new_version) {
-          BdApi.showConfirmationModal(
-            "SelectFormForAdminRank | Новое обновление!",
-            `Ваша версия: \`${curr_version}\` | Новая версия: \`${new_version}\`\n\n \n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n \n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
-            {
-              confirmText: "Установить",
-              cancelText: "Отменить",
-              onConfirm: () => {
-                BdApi.showToast("Начинаем загрузку обновлений..", {type: "info"});
+        const new_versions = versionData['select-forms'];
 
-                request.get(
-                  config.urls[1],
-                  (error, response, body) => {
-                    if (error) {
-                      BdApi.showToast(`Ошибка при загрузка: ${error}`, { type: "error" });
-                      return false;
-                    }
+        if (new_versions && new_versions.length > 0) {
+          var latestVersion = '1.0';
+          var changelogs = '---';
+          
+          for (let i = 0; i < new_versions.length; i++) {
+            if (new_versions[i].versions > curr_version) {
+              latestVersion = new_versions[i].versions;
+              changelogs = new_versions[i].changelogs;
 
-                    if (response.statusCode == 200) {
-                      fs.writeFileSync(
-                        path.join(BdApi.Plugins.folder, "SelectFormForAdminRank.plugin.js"),
-                        body
-                      );
-                      
-                      BdApi.showToast(`Обновление загружено!`, { type: "success" });
-                    } else BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
-                  }
-                );
-              }
+              break;
             }
-          );
-        } else {
-          if (thisIsIntervalCheck) {
-            BdApi.showToast("Обновлений не найдено, пожалуйста попробуйте позже!", { type: "error" });
+          }
+          
+
+          if (curr_version < latestVersion) {
+            BdApi.showConfirmationModal(
+              "SelectFormForAdminRank | Новое обновление!",
+              `Ваша версия: \`${curr_version}\` | Новая версия: \`${latestVersion}\`\n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
+              {
+                confirmText: "Установить",
+                cancelText: "Отменить",
+                onConfirm: () => {
+                  BdApi.showToast("Начинаем загрузку обновления..", { type: "info" });
+
+                  request.get(
+                    config.base_url+"/versions/"+latestVersion+"/SelectFormForAdminRank.plugin.js",
+                    (error, response, body) => {
+                      if (error) {
+                        BdApi.showToast(`Ошибка при загрузке: ${error}`, { type: "error" });
+                        return false;
+                      }
+
+                      if (response.statusCode == 200) {
+                        fs.writeFileSync(
+                          path.join(BdApi.Plugins.folder, "SelectFormForAdminRank.plugin.js"),
+                          body
+                        );
+
+                        BdApi.showToast(`Обновление загружено!`, { type: "success" });
+                      } else {
+                        BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
+                      }
+                    }
+                  );
+                },
+              }
+            );
+          } else {
+            if (thisIsIntervalCheck) {
+              BdApi.showToast("Обновлений не найдено, пожалуйста, попробуйте позже!", { type: "error" });
+            }
           }
         }
       }
     }
   );
 }
+
 
 var styles_default = `.vbd-its-modal-content input {
     background-color: var(--input-background);
@@ -628,95 +656,101 @@ var styles_default = `.vbd-its-modal-content input {
 }
 `;
 
-function load() {
-  checkUpdate(config.version['base']);
+function loadForms(refresh = false) {
+  request.get(
+    config.base_url+"/selections.json",
+    (error, response, body) => {
+      if (error) {
+        BdApi.showToast(error, { type: "error" });
+        return;
+      }
+      
+      if (response.statusCode == 200) {
+        const result = JSON.parse(body.toString());
 
-  
-  setTimeout(() => {
-    request.get(
-      config.urls[2],
-      (error, response, body) => {
-        if (error) {
-          BdApi.showToast(error, { type: "error" });
-          return;
-        }
+        const base = (result['standart']) ? result['standart'].data : 0;
+        const serv = (result['servers']) ? result['servers'].data : 0;
+        const post = (result['post']) ? result['post'].data : 0;
+        const rank = (result['rank']) ? result['rank'].data : 0;
+        const mark = (result['mark']) ? result['mark'].data : 0;
+
         
-        if (response.statusCode == 200) {
-          const result = JSON.parse(body.toString());
-          const base = (result['standart']) ? result['standart'].data : 0;
-          const serv = (result['servers']) ? result['servers'].data : 0;
-          const post = (result['post']) ? result['post'].data : 0;
-          const rank = (result['rank']) ? result['rank'].data : 0;
-          const mark = (result['mark']) ? result['mark'].data : 0;
+        BdApi.showToast("Начинаем загрузку форм..", {type: "info"});
 
-          
-          BdApi.showToast("Начинаем загрузку форм..", {type: "info"});
+        if (base.length > 0) {
+          for (let i = 0; i < base.length; i++) {
+            if (i == 0 && refresh) {
+              Formats = [];
+            }
 
-          if (base.length > 0) {
-            for (let i = 0; i < base.length; i++) {
-              Formats.push({
-                "title": base[i]['title'],
-                "value": base[i]['value'],
-                "disabled": base[i]['disabled'],
-              });
-            }
+            Formats.push({
+              "title": base[i]['title'],
+              "value": base[i]['value'],
+              "disabled": base[i]['disabled'],
+            });
           }
-          if (serv.length > 0) {
-            for (let i = 0; i < serv.length; i++) {
-              Servers.push({
-                "name": serv[i]['name'],
-                "disabled": serv[i]['disabled'],
-              });
-            }
+        }
+        if (serv.length > 0) {
+          for (let i = 0; i < serv.length; i++) {
+            Servers.push({
+              "name": serv[i]['name'],
+              "disabled": serv[i]['disabled'],
+            });
           }
-          if (post.length > 0) {
-            for (let i = 0; i < post.length; i++) {
-              Post.push({
-                "name": post[i]['name'],
-                "disabled": post[i]['disabled'],
-              });
-            }
+        }
+        if (post.length > 0) {
+          for (let i = 0; i < post.length; i++) {
+            Post.push({
+              "name": post[i]['name'],
+              "disabled": post[i]['disabled'],
+            });
           }
-          if (rank.length > 0) {
-            for (let i = 0; i < rank.length; i++) {
-              Rank.push({
-                "name": rank[i]['name'],
-                "disabled": rank[i]['disabled'],
-              });
-            }
+        }
+        if (rank.length > 0) {
+          for (let i = 0; i < rank.length; i++) {
+            Rank.push({
+              "name": rank[i]['name'],
+              "disabled": rank[i]['disabled'],
+            });
           }
-          if (mark.length > 0) {
-            for (let i = 0; i < mark.length; i++) {
-              Mark.push({
-                "name": mark[i]['name'],
-                "disabled": mark[i]['disabled'],
-              });
-            }
+        }
+        if (mark.length > 0) {
+          for (let i = 0; i < mark.length; i++) {
+            Mark.push({
+              "name": mark[i]['name'],
+              "disabled": mark[i]['disabled'],
+            });
           }
+        }
 
-          // CUSTOM FORM`S
-          if (fs.existsSync(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json")) {
-            fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
-              if (err) {
-                setTimeout(() => {
-                  BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" })
-                }, 1500);
-                console.log(err);
+        // CUSTOM FORM`S
+        if (fs.existsSync(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json")) {
+          fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
+            if (err) {
+              setTimeout(() => {
+                BdApi.showToast("Кастомные форма не загружены!\n"+err, { type: "error" })
+              }, 500);
+              console.log(err);
+
+              return;
+            }
   
-                return;
-              }
-    
-              if (data == "{}" || data['forms'] == "[]" || !data) {
-                setTimeout(() => {
-                  BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
-                }, 1500);
-                
-                return;
-              } else {
-                const form = JSON.parse(data)['forms'];
-  
-                if (form.length > 0) {
-                  for (let i = 0; i < form.length; i++) {
+            if (data == "{}" || data['forms'] == "[]" || !data) {
+              setTimeout(() => {
+                BdApi.showToast("Кастомные форма не настроены!", { type: "error" })
+              }, 500);
+              
+              return;
+            } else {
+              const form = JSON.parse(data)['forms'];
+
+              if (form.length > 0) {
+                console.log(form.length);
+
+                for (let i = 0; i < form.length; i++) {
+                  const existingIndex = Formats.findIndex(item => item.title === form[i]['title']);
+
+                  if (existingIndex === -1) {
                     Formats.push({
                       "title": form[i]['title'],
                       "value": form[i]['value'],
@@ -725,21 +759,25 @@ function load() {
                   }
                 }
               }
-            });
-          } else {
-            loadCustomForms(true);
-          }
-
-          
-          setTimeout(() => {
-            BdApi.showToast("Все формы загружены!", { type: "success" });
-          }, 3000);
+            }
+          });
         } else {
-          BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @kotyarakryt`, { type: "error" });
+          loadCustomForms(true);
         }
+
+        
+        setTimeout(() => {
+          if (refresh) {
+            BdApi.showToast("Формы успешно перезагружены!", { type: "success" });
+          } else {
+            BdApi.showToast("Формы успешно загружены!", { type: "success" });
+          }
+        }, 500);
+      } else {
+        BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @kotyarakryt`, { type: "error" });
       }
-    );
-  }, 100);
+    }
+  );
 }
 
 function loadCustomForms(notify = false) {
@@ -779,6 +817,8 @@ function loadCustomForms(notify = false) {
       return false;
     });
   } else {
+    BdApi.showToast("Начинаем загрузку кастомных форм..", {type: "info"});
+
     setTimeout(() => {
       fs.readFile(BdApi.Plugins.folder+"\\"+"SelectFormForAdminRank.config.json", 'utf8', function(err, data) {
         if (err) {
@@ -814,11 +854,11 @@ function loadCustomForms(notify = false) {
           }
         }
       });
-    }, 150);
+    }, 300);
 
     if(notify) {
       setTimeout(() => {
-        BdApi.showToast("Кастомные форма успешно загружены!", { type: "success" });
+        BdApi.showToast("Кастомные формы успешно загружены!", { type: "success" });
       }, 500);
     }
 
@@ -834,7 +874,11 @@ function clearFormData() {
   }
   BdApi.showToast("Все кастомные форма были очищены!", { type: "warning" });
   setTimeout(() => {
-    loadCustomForms(true);
+    loadForms(true);
+
+    setTimeout(() => {
+      loadCustomForms(true);
+    }, 1500);
   }, 1000);
 }
 
@@ -842,9 +886,19 @@ var Chat = BdApi.Webpack.getModule((m) => m.Z?.type?.render?.toString().includes
 
 module.exports = meta => {
   return {
-    load,
+    load: () => {
+      Object.assign(PluginSettings, BdApi.Data.load(meta.name, "settings"));
+
+      if (PluginSettings["UpdateSystem"]) {
+        checkUpdate(config.version['base']);
+      }
+
+      setTimeout(() => {
+        loadForms();
+      }, 100);
+    },
     start: () => {
-      Object.assign(Settings, BdApi.Data.load(meta.name, "settings"));
+      Object.assign(PluginSettings, BdApi.Data.load(meta.name, "settings"));
 
       BdApi.DOM.addStyle("vbd-st", styles_default);
       BdApi.Patcher.after("vbd-st", Chat.Z.type, "render", (_this, _args, res) => {
@@ -886,8 +940,7 @@ module.exports = meta => {
       createFormButton.style.padding = "1rem 3rem";
       createFormButton.style.transition = "0.2s";
       createFormButton.textContent = "Создать новую форму";
-      // TODO: Доработать функцию, исправить баг с дублированием прошлых форм
-      // createFormButton.addEventListener("click", () => openModal((props) => BdApi.React.createElement(ShowCreateFormModal, { rootProps: props })));
+      createFormButton.addEventListener("click", () => openModal((props) => BdApi.React.createElement(ShowCreateFormModal, { rootProps: props })));
       SettingsPanel.appendChild(createFormButton);
 
 
@@ -907,7 +960,6 @@ module.exports = meta => {
       deleteFormButton.addEventListener("click", () => clearFormData());
       SettingsPanel.appendChild(deleteFormButton);
 
-
       const checkUpdateFormButton = document.createElement("button");
       checkUpdateFormButton.style.position = "relative";
       checkUpdateFormButton.style.background = "#005089";
@@ -919,11 +971,84 @@ module.exports = meta => {
       checkUpdateFormButton.style.letterSpacing = "0.1rem";
       checkUpdateFormButton.style.fontSize = "1rem";
       checkUpdateFormButton.style.padding = "1rem 3rem";
-      checkUpdateFormButton.style.marginTop = "15px";
+      checkUpdateFormButton.style.marginTop = "5px";
       checkUpdateFormButton.textContent = "Проверить на наличие обновлений";
       checkUpdateFormButton.addEventListener("click", () => checkUpdate(config.version['base'], true));
       SettingsPanel.appendChild(checkUpdateFormButton);
 
+      const restartPluginDiv = document.createElement("div");
+      restartPluginDiv.style.position = "relative";
+      restartPluginDiv.style.marginTop = "15px";
+
+      const restartPluginCheckbox = document.createElement("input");
+      restartPluginCheckbox.type = "checkbox";
+      restartPluginCheckbox.id = "restartPluginCheckbox";
+      restartPluginCheckbox.checked = (PluginSettings["UpdateSystem"]) ? true : false;
+
+      restartPluginDiv.appendChild(restartPluginCheckbox);
+      SettingsPanel.appendChild(restartPluginDiv);
+
+      const label = document.createElement("label");
+      label.setAttribute("for", "restartPluginCheckbox");
+      label.style.position = "relative";
+      label.textContent = `Предлагать новые обновления | ${((PluginSettings["UpdateSystem"]) ? 'ВКЛ' : 'ВЫКЛ')}`;
+      SettingsPanel.appendChild(label);
+
+      const checkboxStyle = `
+        opacity: 0;
+        color: #fff;
+      `;
+
+      restartPluginCheckbox.style.cssText = checkboxStyle;
+
+      const labelStyleOFF = `
+        position: relative;
+        background: #cd3232;
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 5px;
+        letter-spacing: 0.1rem;
+        font-size: 1rem;
+        padding: 1rem 3rem;
+        margin-top: 15px;
+      `;
+      const labelStyleON = `
+        position: relative;
+        background: #32CD32;
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 5px;
+        letter-spacing: 0.1rem;
+        font-size: 1rem;
+        padding: 1rem 3rem;
+        margin-top: 15px;
+      `;
+
+      label.style.cssText = (PluginSettings["UpdateSystem"]) ? labelStyleON : labelStyleOFF;
+
+
+      restartPluginCheckbox.addEventListener("change", function () {
+          if (this.checked) {
+            label.style.cssText = labelStyleON;
+            label.textContent = "Предлагать новые обновления | ВКЛ";
+            PluginSettings["UpdateSystem"] = true;
+
+            BdApi.showToast("Предложение об обновлении, будет отображаться при запуске плагина!", { type: "success" });
+          } else {
+            label.style.cssText = labelStyleOFF;
+            label.textContent = "Предлагать новые обновления | ВЫКЛ";
+            PluginSettings["UpdateSystem"] = false;
+
+            BdApi.showToast("Предложение об обновлении, больше не будет отображаться при запуске плагина!", { type: "warning" });
+          }
+
+          
+          BdApi.Data.save(meta.name, "settings", PluginSettings);
+      });
 
       return SettingsPanel;
     }
