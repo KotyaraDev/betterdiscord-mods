@@ -335,7 +335,7 @@ function ShowFormModal({ rootProps }) {
           renderOptionValue: () => server,
         }
       ) : null,
-      (format && (format != "Принят на Модератора" && format != "Откат дейcтвия" && format != "Выдать соц. рейтинг" && format != "Снять соц. рейтинг" && format != "Выдача банов")) ? BdApi.React.createElement(
+      (format == "Прошёл проверку НКВД" && format == "Прошёл обучение" && format == "Принят в отдел (ЛС-ВС)" && format == "Повышен в ранге" && format == "Снятие с поста" && format == "Перевод в отдел Дневной/Ночной" && format == "Выдать устное(ые) предупреждение(я)" && format == "Выдать предупреждение(я)" && format == "Снять предупреждение(я)" && format == "Выдать выговор(ы)" && format == "Снять выговор(ы)" && format == "Выдать отпуск" && format == "Снять отпуск" && format == "Выдать метку" && format == "Выдать рекомендацию" && format == "Сгорает рекомендация" && format == "Выдать грань снятии" && format == "Снять грань снятии") ? BdApi.React.createElement(
         Select,
         {
           placeholder: "Выберите должность человека",
@@ -533,7 +533,7 @@ function findInReactTree(root, filter) {
 
 function checkUpdate(curr_version, thisIsIntervalCheck = false) {
   request.get(
-    config.base_url+"/configs.dev.json",
+    config.base_url+"/configs.json",
     (error, response, body) => {
       if (error) {
         BdApi.showToast(error, { type: "error" });

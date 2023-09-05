@@ -533,7 +533,7 @@ function findInReactTree(root, filter) {
 
 function checkUpdate(curr_version, thisIsIntervalCheck = false) {
   request.get(
-    config.base_url+"/configs.dev.json",
+    config.base_url+"/configs.json",
     (error, response, body) => {
       if (error) {
         BdApi.showToast(error, { type: "error" });
