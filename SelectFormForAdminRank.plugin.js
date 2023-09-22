@@ -5,7 +5,7 @@
  * @description Готовые формы для админ-рангов
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.6.1
+ * @version 1.6.2
  */
 
 "use strict";
@@ -14,7 +14,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.6.1",
+    "base": "1.6.2",
   },
   base_url: "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main",
 }
@@ -59,8 +59,6 @@ function ShowFormModal({ rootProps }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  
-
   const [formatted, rendered] = useMemo(() => {
     const selectedFormat = Formats.find((f) => f.title === format);
     return [(selectedFormat) ? selectedFormat : "---", format];
@@ -68,51 +66,54 @@ function ShowFormModal({ rootProps }) {
 
 
   function getFormattedResult() {
-    if (formatted.value) {
-      if (formatted.value.includes("{{post}}")) {
-        formatted.value = formatted.value.replace("{{post}}", post);
-      }
-      if (formatted.value.includes("{{rank}}")) {
-        formatted.value = formatted.value.replace("{{rank}}", rank);
-      }
-      if (formatted.value.includes("{{server}}")) {
-        formatted.value = formatted.value.replace("{{server}}", server);
-      }
-      if (formatted.value.includes("{{mark}}")) {
-        formatted.value = formatted.value.replace("{{mark}}", mark);
-      }
-      if (formatted.value.includes("{{number}}")) {
-        formatted.value = formatted.value.replace("{{number}}", number);
-      }
-      if (formatted.value.includes("{{reason}}")) {
-        formatted.value = formatted.value.replace("{{reason}}", reason);
-      }
-      if (formatted.value.includes("{{nick}}")) {
-        formatted.value = formatted.value.replace("{{nick}}", nick);
-      }
-      if (formatted.value.includes("{{nick_off}}")) {
-        formatted.value = formatted.value.replace("{{nick_off}}", nick2);
-      }
-      if (formatted.value.includes("{{steamid}}")) {
-        formatted.value = formatted.value.replace("{{steamid}}", steamid);
-      }
-      if (formatted.value.includes("{{term}}")) {
-        formatted.value = formatted.value.replace("{{term}}", term);
-      }
-      if (formatted.value.includes("{{s_date}}")) {
-        formatted.value = formatted.value.replace("{{s_date}}", startDate);
-      } 
-      if (formatted.value.includes("{{e_date}}")) {
-        formatted.value = formatted.value.replace("{{e_date}}", endDate);
-      } 
-      if (formatted.value.includes("{{timestamp}}")) {
-        formatted.value = formatted.value.replace("{{timestamp}}", Math.floor(Date.now() / 1000));
-      }
-    }
+    var result = formatted.value;
 
-    return formatted.value;
+    if (result) {
+      if (result.includes("{{post}}")) {
+        result = result.replace("{{post}}", post);
+      }
+      if (result.includes("{{rank}}")) {
+        result = result.replace("{{rank}}", rank);
+      }
+      if (result.includes("{{server}}")) {
+        result = result.replace("{{server}}", server);
+      }
+      if (result.includes("{{mark}}")) {
+        result = result.replace("{{mark}}", mark);
+      }
+      if (result.includes("{{number}}")) {
+        result = result.replace("{{number}}", number);
+      }
+      if (result.includes("{{reason}}")) {
+        result = result.replace("{{reason}}", reason);
+      }
+      if (result.includes("{{nick}}")) {
+        result = result.replace("{{nick}}", nick);
+      }
+      if (result.includes("{{nick_trigger}}")) {
+        result = result.replace("{{nick_trigger}}", nick2);
+      }
+      if (result.includes("{{steamid}}")) {
+        result = result.replace("{{steamid}}", steamid);
+      }
+      if (result.includes("{{term}}")) {
+        result = result.replace("{{term}}", term);
+      }
+      if (result.includes("{{s_date}}")) {
+        result = result.replace("{{s_date}}", startDate);
+      } 
+      if (result.includes("{{e_date}}")) {
+        result = result.replace("{{e_date}}", endDate);
+      } 
+      if (result.includes("{{timestamp}}")) {
+        result = result.replace("{{timestamp}}", Math.floor(Date.now() / 1000));
+      }
+      
+      return result;
+    } else {
+      return "Похоже, произошла ошибка..";
+    }
   }
-  
 
   return BdApi.React.createElement(
     ModalRoot,
@@ -335,6 +336,7 @@ function ShowFormModal({ rootProps }) {
               rawText: getFormattedResult(),
               plainText: getFormattedResult()
             });
+
             rootProps.onClose();
           }
         },
