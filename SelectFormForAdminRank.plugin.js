@@ -1,11 +1,11 @@
 /**
  * @name SelectFormForAdminRank
- * @author Котяра
- * @authorId 701903800302305371
+ * @author Котяра(kotyarakryt) && Олёжа(oleg_alegro)
+ * @authorId 690314883404791849
  * @description Готовые формы для админ-рангов
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.6.2
+ * @version 1.7
  */
 
 "use strict";
@@ -14,7 +14,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.6.2",
+    "base": "1.7",
   },
   base_url: "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main",
 }
@@ -111,7 +111,7 @@ function ShowFormModal({ rootProps }) {
       
       return result;
     } else {
-      return "Похоже, произошла ошибка..";
+      return "Похоже, произошла ошибка..\nСообщите об этом разработчику: @oleg_alegro";
     }
   }
 
@@ -488,7 +488,7 @@ function checkUpdate(curr_version, thisIsIntervalCheck = false) {
           if (curr_version < latestVersion) {
             BdApi.showConfirmationModal(
               "SelectFormForAdminRank | Новое обновление!",
-              `Ваша версия: \`${curr_version}\` | Новая версия: \`${latestVersion}\`\n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@kotyarakryt__*`,
+              `Ваша версия: \`${curr_version}\` | Новая версия: \`${latestVersion}\`\n\n\`СПИСОК ИЗМЕНЕНИЙ:\`\n\n${changelogs}\n\n> *\`ВАЖНО!\` Если вы заметили ошибки, баги, недоработки или что-либо подобное, пожалуйста, сообщите о них __@oleg_alegro__*`,
               {
                 confirmText: "Установить",
                 cancelText: "Отменить",
@@ -499,7 +499,7 @@ function checkUpdate(curr_version, thisIsIntervalCheck = false) {
                     config.base_url+"/versions/"+latestVersion+"/SelectFormForAdminRank.plugin.js",
                     (error, response, body) => {
                       if (error) {
-                        BdApi.showToast(`Ошибка при загрузке: ${error}`, { type: "error" });
+                        BdApi.showToast(`Ошибка при загрузке: ${error}\nСообщите об этом разработчику: @oleg_alegro`, { type: "error" });
                         return false;
                       }
 
@@ -511,7 +511,7 @@ function checkUpdate(curr_version, thisIsIntervalCheck = false) {
 
                         BdApi.showToast(`Обновление загружено!`, { type: "success" });
                       } else {
-                        BdApi.showToast(`Ошибка при установке обновления.`, { type: "warning" });
+                        BdApi.showToast(`Ошибка при установке обновления.\nСообщите об этом разработчику: @oleg_alegro`, { type: "warning" });
                       }
                     }
                   );
@@ -699,7 +699,7 @@ function loadForms(refresh = false) {
           }
         }, 500);
       } else {
-        BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @kotyarakryt`, { type: "error" });
+        BdApi.showToast(`Формы не загружены!\nСообщите об этом разработчику: @oleg_alegro`, { type: "error" });
       }
     }
   );
