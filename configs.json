@@ -32,5 +32,10 @@
       "changes": "Полная переработка плагина",
       "build": "stable"
     }
+    {
+      "version": "2.1",
+      "changes": "Тестовый билд",
+      "build": "dev"
+    }
   ]
 }
