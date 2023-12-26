@@ -149,6 +149,10 @@
                 "disabled": false
             },
             {
+                "name": "LOUISIANA RP",
+                "disabled": false
+            },
+            {
                 "name": "Тюрьма RP | НЕДОСТУПНО",
                 "disabled": true
             }
@@ -186,12 +190,12 @@
                 "disabled": false
             },
             {
-                "name": "Заместитель Менеджера | НЕДОСТУПНО",
-                "disabled": true
+                "name": "Заместитель Менеджера",
+                "disabled": false
             },
             {
-                "name": "Менеджер | НЕДОСТУПНО",
-                "disabled": true
+                "name": "Менеджер",
+                "disabled": false
             }
         ]
     },
@@ -227,12 +231,12 @@
                 "disabled": false
             },
             {
-                "name": "root | НЕДОСТУПНО",
-                "disabled": true
+                "name": "root",
+                "disabled": false
             },
             {
-                "name": "superadmin | НЕДОСТУПНО",
-                "disabled": true
+                "name": "superadmin",
+                "disabled": false
             }
         ]
     },
@@ -257,6 +261,18 @@
             },
             {
                 "name": "+300",
+                "disabled": false
+            },
+            {
+                "name": "+350",
+                "disabled": false
+            },
+            {
+                "name": "+400",
+                "disabled": false
+            },
+            {
+                "name": "+450",
                 "disabled": false
             },
             {

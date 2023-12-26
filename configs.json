@@ -1,11 +1,4 @@
 {
-  "versions": {
-    "select-forms": "1.7"
-  },
-  "changelogs": {
-    "select-forms": "Все права на проект, были переданы человеку (@oleg_alegro)"
-  },
-
   "select-forms": [
     {
       "versions": "1.5.2",
@@ -30,6 +23,14 @@
     {
       "versions": "1.7",
       "changelogs": "Все права на проект, были переданы человеку (@oleg_alegro)"
+    }
+  ],
+
+  "AdminRankForms": [
+    {
+      "version": "2.0",
+      "changes": "Полная переработка плагина",
+      "build": "stable"
     }
   ]
 }
