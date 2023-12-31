@@ -34,12 +34,16 @@
     {
       "version": "2.0",
       "changes": "Полная переработка плагина",
-      "build": "stable"
+      "build": "stable",
+      "required": "false",
+      "disabled": "false"
     },
     {
       "version": "2.1",
       "changes": "Тестовый билд",
-      "build": "dev"
+      "build": "dev",
+      "required": "false",
+      "disabled": "false"
     }
   ]
 }
