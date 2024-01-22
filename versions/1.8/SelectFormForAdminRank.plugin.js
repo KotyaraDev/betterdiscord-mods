@@ -6,7 +6,7 @@
  * @invite ZaNnGGNDWb
  * @source https://github.com/KotyaraDev/betterdiscord-mods/blob/main/SelectFormForAdminRank.plugin.js
  * @website https://github.com/KotyaraDev/betterdiscord-mods/tree/main/
- * @version 1.7.3
+ * @version 1.8
  */
 
 "use strict";
@@ -15,7 +15,7 @@ const path = require('path');
 const request = require("request");
 const config = {
   version: {
-    "base": "1.7.3",
+    "base": "1.8",
   },
   base_url: "https://raw.githubusercontent.com/KotyaraDev/betterdiscord-mods/main",
 }

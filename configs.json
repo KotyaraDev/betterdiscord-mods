@@ -31,6 +31,10 @@
     {
       "versions": "1.7.3",
       "changelogs": "1. Все формы вновь доступны\n2. Добавил метку '+200'\n3. Добавил для 'выдачи банов' сервер 'LOUISIANA RP'\n4. Исправил ошибку с {{dolj}} (Выбором должностей)\n\n> Подать баг: https://discord.gg/ZaNnGGNDWb"
+    },
+    {
+      "versions": "1.8",
+      "changelogs": "1. Исправление ошибок с загрузкой форм\n\n> Подать баг: https://discord.gg/ZaNnGGNDWb"
     }
   ],
 
